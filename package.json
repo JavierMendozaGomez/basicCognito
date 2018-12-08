@@ -1,0 +1,11 @@
+{
+  "name": "basic-cognito",
+  "version": "1.0.0",
+  "description": "Test basic cognito",
+  "author": "JavierMendozaGOmez",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
