@@ -1,7 +1,0 @@
-{
-    "name": "register",
-    "version": "1.0.0",
-    "dependencies": {
-        "aws-sdk": "^2.373.0"
-    }
-}
