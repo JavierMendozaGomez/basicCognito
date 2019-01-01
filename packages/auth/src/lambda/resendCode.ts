@@ -4,32 +4,25 @@ import {
     getCognito
 } from '../credentials'
 
-const login: Handler = async(event:  any, context) => {
+const resendCode: Handler = async(event:  any, context) => {
     const body = JSON.parse(event.body)
-    const {username, password} = body
-    const {ClientId, UserPoolId} = await getCognito();
+    const {username} = body
+    const {ClientId} = await getCognito();
     const cognito = new AWS.CognitoIdentityServiceProvider();
     
     const params = {
-      AuthFlow: 'ADMIN_NO_SRP_AUTH',
-      AuthParameters: {
-        USERNAME: username,
-        PASSWORD: password
-      },
       ClientId,
-      UserPoolId
+      Username: username
     };
     
     try{
-        const data = await cognito.adminInitiateAuth(params).promise();
-        const {AuthenticationResult} = data;
+        const data = await cognito.resendConfirmationCode(params).promise();;
         const response = {
             statusCode: 200,
             body: JSON.stringify({
-            message: AuthenticationResult,
+            message: data,
             }),
         }; 
-        
         return Promise.resolve(response);
     } catch(err){
         const responseErr = {
@@ -42,5 +35,5 @@ const login: Handler = async(event:  any, context) => {
     }
 }
 export {
-  login as handler,
+  resendCode as handler,
 };

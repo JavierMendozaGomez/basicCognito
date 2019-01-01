@@ -4,16 +4,34 @@ service:
 # Add the serverless-webpack plugin
 plugins:
   - '@hewmen/serverless-plugin-typescript'
-
+  - serverless-offline
 provider:
   name: aws
   runtime: nodejs8.10
   region: eu-west-2
 
 functions:
-  hello:
-    handler: handler.hello
+  signup:
+    handler: src/lambda/signup.handler
     events:
       - http:
-          method: get
-          path: hello
+          method: post
+          path: auth/signup
+  login:
+    handler: src/lambda/login.handler
+    events:
+      - http:
+          method: post
+          path: auth/login
+  resendCode:
+    handler: src/lambda/resendCode.handler
+    events:
+      - http:
+          method: post
+          path: auth/resendCode
+  confirmCode:
+    handler: src/lambda/confirmCode.handler
+    events:
+      - http:
+          method: post
+          path: auth/confirmCode
