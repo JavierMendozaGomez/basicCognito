@@ -1,23 +1,23 @@
 import * as AWS from 'aws-sdk'
-import { APIGatewayEvent, Handler } from 'aws-lambda';
-import {
-    getCognito
-} from '../credentials'
+import { Handler } from 'aws-lambda';
+import {clientId, userPoolId} from  '../config';
+import { AdminInitiateAuthRequest } from 'aws-sdk/clients/cognitoidentityserviceprovider';
+import * as createHttpError from 'http-errors';
 
-const login: Handler = async(event:  any, context) => {
+const login: Handler = async(event: any, context) => {
     const body = JSON.parse(event.body)
-    const {username, password} = body
-    const {ClientId, UserPoolId} = await getCognito();
+    const {username, password} = body;
+    if(!username || !password)
+        return new createHttpError.BadRequest();
     const cognito = new AWS.CognitoIdentityServiceProvider();
-    
-    const params = {
+    const params: AdminInitiateAuthRequest = {
       AuthFlow: 'ADMIN_NO_SRP_AUTH',
       AuthParameters: {
         USERNAME: username,
         PASSWORD: password
       },
-      ClientId,
-      UserPoolId
+      ClientId: clientId,
+      UserPoolId: userPoolId
     };
     
     try{

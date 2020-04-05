@@ -1,17 +1,14 @@
 import * as AWS from 'aws-sdk'
-import { APIGatewayEvent, Handler } from 'aws-lambda';
-import {
-    getCognito
-} from '../credentials'
+import {Handler } from 'aws-lambda';
+import {clientId} from  '../config';
 
 const resendCode: Handler = async(event:  any, context) => {
     const body = JSON.parse(event.body)
     const {username} = body
-    const {ClientId} = await getCognito();
     const cognito = new AWS.CognitoIdentityServiceProvider();
     
     const params = {
-      ClientId,
+      ClientId: clientId,
       Username: username
     };
     

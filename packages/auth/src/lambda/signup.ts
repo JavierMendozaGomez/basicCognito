@@ -1,28 +1,40 @@
 import * as AWS from 'aws-sdk'
 import { APIGatewayEvent, Handler } from 'aws-lambda';
-import {
-    getCognito
-} from '../credentials'
+import {clientId, userPoolId} from  '../config';
+import { SignUpRequest , AdminConfirmSignUpRequest} from 'aws-sdk/clients/cognitoidentityserviceprovider';
+import CognitoIdentityServiceProvider = require('aws-sdk/clients/cognitoidentityserviceprovider');
+import * as createHttpError from 'http-errors';
 
 const signup: Handler = async(event:  any, context) => {
-    const body = JSON.parse(event.body)
-    const {username, password} = body
-    const {ClientId} = await getCognito();
-    const cognito = new AWS.CognitoIdentityServiceProvider();
+    const body = JSON.parse(event.body);
+    const {username, password, phone} = body;
+    if(!username || !password || !phone) 
+      return new createHttpError.BadRequest();
+    const cognito: CognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
     
-    const params = {
-        ClientId,
+    const paramsSignup: SignUpRequest = {
+        ClientId: clientId, 
         Password: password, 
         Username: username,
         UserAttributes: [
           {
             Name: 'email', 
             Value: username
+          },
+          {
+            Name: 'phone_number',
+            Value: phone
           }
         ]
     };
-    try{
-        const data = await cognito.signUp(params).promise();
+    const paramsAdminConfirm: AdminConfirmSignUpRequest = {
+      UserPoolId: userPoolId,
+      Username: username
+    };
+    try {
+        const data = await cognito.signUp(paramsSignup).promise();
+        //TO FIX BEFORE PROD, DO NOT AUTO CONFIRM USER
+        await cognito.adminConfirmSignUp(paramsAdminConfirm).promise();
         const response = {
             statusCode: 200,
             body: JSON.stringify({

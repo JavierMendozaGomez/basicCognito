@@ -10,11 +10,6 @@ const getCredentials: any = async (key : string) => {
         throw new Error('Invalid resource')
     }
 }
-const getCognito = async() => {
-    return JSON.parse(await getCredentials('cognito'));
-}
-
 export {
     getCredentials,
-    getCognito,
 };
